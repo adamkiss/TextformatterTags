@@ -1,20 +1,33 @@
 # Field Tags v0.1
 
-This Textformatter adds customizable Tag Parser System to your fields. Now you can use Django-like `{{ XXX }}` syntax to output contents of other fields into your textareas, thus avoiding breaking your content into unmeaningful parts.
+This Textformatter adds customizable Tag Parser System to your fields. Now you can use Django-like `{{ XXX }}` and `{% XXX %} {% /XXX %}` syntax to output contents of other fields into your textareas, thus avoiding breaking your content into unmeaningful parts.
 
 ## Syntax
 
-Syntax is TBA. Alpha version uses following syntax:
+Original, pre-alpha version uses following syntax:
 
 ```
   {{ example parameter:value parameter2:value parameter3:value }}
 ```
 
-This syntax probably isn't final, as I would like to make one HTML–frendly and one MD-friendly (read: familiar and at the same time distinguishable from HTML and/or Markdown)
+Syntax, we're currently looking at is:
+
+```
+  //non-block tags
+  {{ tagid: parameter1=value, parameter2=value }}
+
+  //block tags
+  {% tagid: parameter1=value, parameter2=value %}
+    ... //contents of block
+  {% /tagid %}
+
+```
+
+This is following e.g. Django, and to let person reading to code immediately know whether to look for the end of the block or to know that this is a single (simple) tag.
 
 ## Extensibility
 
-Auto-extensibility is already supported; Following example from **syntax** section, upon finding tag, this module automatically looks for `tagExample` function in itself and gives the function all parameters in associative array (note: possibly `StdObject`). This is one of the rough spots–I'm still looking into how to give the power of creating custom function to developers without having to modifiy Plugin files.
+We're probably going the most sane way possible: via ProcessWire hook system. This way, you (theoretically) won't have to touch any code; You'll install this Textformatter, install modules that support it and voilla, you're done! :)
 
 ## License
 
