@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * Tags for Text fields
+ *
+ * Module that gives you option to run filters over blocks of text in text fields via blocks tags
+ * or invoke advanced funcionality via simple tags
+ * 
+ * @author Adam Kiss
+ * @version 0.0.2
+ * @since 2012-09-16
+ * @license WTFPL <http://sam.zoy.org/wtfpl/>
+ * 
+ * @link http://www.adamkiss.com
+ */
+
+class textformatterTags extends Textformatter {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Tags for Text fields',
+			'version' => 2, 
+			'summary' => "Gives you simple and block tags funcionality in text fields"
+		); 
+	}
+
+	public function format(&$str) {
+
+		$str = $this->applyTags($str);
+
+	}
+
+	private function applyTags( $text ) {
+		//init
+		$html = $text;
+
+		$found = ''; $tagsFound = array();
+
+		preg_match_all('/{{\s?([^}]*)\s?}}/', $html, $found, PREG_SET_ORDER);
+
+		foreach ($found as $f){
+			try {
+				$original = $f[0];
+				$parts = explode(' ', $f[1]);
+				$tag = explode(':', array_shift($parts));
+				// $tag now should be array(0=>group, 1=>functions)
+				$parameters = implode('', $parts);
+				// $parameters now should contain PW parsable query
+
+				//apply tag by group, function and send parameters
+				$html = str_ireplace(
+					$original,
+					$this->apply_tag($tag[0], $tag[1], $parameters, $original),
+					$html);
+			} catch (Exception $e) {
+				//
+			}
+		}
+
+		return $html;
+	}
+
+	private function apply_tag($group, $function, $parameters, $original_tag){
+		// look up if we have such tag
+		$exists = true;
+		if ($exists) {
+			$return = "<strong>Calling function {$function} from group {$group} ";
+			if (!empty($parameters)){
+				$params = new Selectors($parameters);
+				$return .= "with parameters: ";
+				foreach ($params as $p) {
+					$return .= " {$p->field} set as {$p->value} & ";
+				}
+				$return .= ". </strong>";
+			}else{
+				$return .= "without parameters.</strong>";
+			}
+			return $return;
+		}else{
+			return $original_tag;
+		}
+	}
+}
