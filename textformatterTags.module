@@ -7,77 +7,169 @@
  * or invoke advanced funcionality via simple tags
  * 
  * @author Adam Kiss
- * @version 0.0.2
+ * @version 0.0.5
  * @since 2012-09-16
  * @license WTFPL <http://sam.zoy.org/wtfpl/>
  * 
  * @link http://www.adamkiss.com
  */
 
-class textformatterTags extends Textformatter {
+class TextformatterTags extends WireData implements Module, ConfigurableModule {
 
-	public static function getModuleInfo() {
-		return array(
-			'title' => 'Tags for Text fields',
-			'version' => 2, 
-			'summary' => "Gives you simple and block tags funcionality in text fields"
-		); 
-	}
+  // module information
+  public static function getModuleInfo() {
+    return array(
+      // basic information
+      'title' => 'Tags for Text fields',
+      'summary' => "Gives you simple and block tags funcionality in text fields",
+      'version' => 5, 
+      // load information
+      'singular' => true,
+      'autoload' => false,
+      // requirements
+      'requires' => 'TextformatterPlaintextMatrix'
+    );
+  }
 
-	public function format(&$str) {
+  public function __construct() {}
 
-		$str = $this->applyTags($str);
+  // config
+  static public function getModuleConfigInputfields(array $data) {
 
-	}
+    $inputfields = new InputfieldWrapper();
 
-	private function applyTags( $text ) {
-		//init
-		$html = $text;
+    // var_dump($data);
 
-		$found = ''; $tagsFound = array();
+    // $f = wire('modules')->get('InputfieldTextarea');
+    // $f->attr('name', 'installed_tags');
+    // $f->attr('value', 'jeblina');
+    // //$f->collapsed = true;
+    // $f->label = "Installed Tags";
+    // $f->description = "! Please do not touch this, or you'll screw this up royally !";
+    // $inputfields->add($f);
 
-		preg_match_all('/{{\s?([^}]*)\s?}}/', $html, $found, PREG_SET_ORDER);
+    return $inputfields;
+  }
 
-		foreach ($found as $f){
-			try {
-				$original = $f[0];
-				$parts = explode(' ', $f[1]);
-				$tag = explode(':', array_shift($parts));
-				// $tag now should be array(0=>group, 1=>functions)
-				$parameters = implode('', $parts);
-				// $parameters now should contain PW parsable query
+  // variables
 
-				//apply tag by group, function and send parameters
-				$html = str_ireplace(
-					$original,
-					$this->apply_tag($tag[0], $tag[1], $parameters, $original),
-					$html);
-			} catch (Exception $e) {
-				//
-			}
-		}
+  /**
+   * Plain Text Matrix (for reading data)
+   */
+  private $ptm = false;
 
-		return $html;
-	}
+  /**
+   * Regexp for pair tags
+   */
+  private $_rgx_pair = '/{{\s?([^}]*)\s?([^}]*)?\s?}}([^{]*){{\s?\/\\1\s?}}/';
+  
+  /**
+   * Regexp for single tags
+   */
+  private $_rgx_tag  = '/{{\s?([^}]*)\s?([^}]*)?\s?}}/';
 
-	private function apply_tag($group, $function, $parameters, $original_tag){
-		// look up if we have such tag
-		$exists = true;
-		if ($exists) {
-			$return = "<strong>Calling function {$function} from group {$group} ";
-			if (!empty($parameters)){
-				$params = new Selectors($parameters);
-				$return .= "with parameters: ";
-				foreach ($params as $p) {
-					$return .= " {$p->field} set as {$p->value} & ";
-				}
-				$return .= ". </strong>";
-			}else{
-				$return .= "without parameters.</strong>";
-			}
-			return $return;
-		}else{
-			return $original_tag;
-		}
-	}
+  /**
+   * Array of loaded modules
+   */
+  private $loaded_modules = false;
+
+  //
+
+  public function init() {
+    echo "<pre>";
+
+    $this->ptm = $this->modules->get('TextformatterPlaintextMatrix');
+    $this->ptm->format($testtest);
+
+    // $data = array (
+    //   'itags' => array(
+    //     'osem:test'=>array('module'=>'tvojtato'),
+    //     'devat:test'=>array('module'=>'tvojtato')
+    //     )
+    // );
+
+    // var_dump($data);
+    // $this->modules->saveModuleConfigData(get_class($this), $data);
+
+    echo "</pre>";
+  }
+
+  public function formatValue(Page $page, Field $field, &$value) {
+    //$str = $this->applyTags($str);
+    //$value = $this->parsePairTags($value);
+
+    echo "<pre>";
+
+    //$this->loaded_modules = array();
+    $m=$this->modules->get('TagsExample');
+    var_dump('---');
+    var_dump($this->itags);
+
+    echo "</pre>";
+  }
+
+  private function applyTags( $text ) {
+    //init
+    $html = $text;
+
+    $found = ''; $tagsFound = array();
+
+    preg_match_all($this->_rgx_tag, $html, $found, PREG_SET_ORDER);
+
+    foreach ($found as $f){
+      try {
+        $original = $f[0];
+        $parts = explode(' ', $f[1]);
+        $tag = explode(':', array_shift($parts));
+        // $tag now should be array(0=>group, 1=>functions)
+        $parameters = implode('', $parts);
+        // $parameters now should contain PW parsable query
+
+        //apply tag by group, function and send parameters
+        $html = str_ireplace(
+          $original,
+          $this->apply_tag($tag[0], $tag[1], $parameters, $original),
+          $html);
+      } catch (Exception $e) {
+        //
+      }
+    }
+
+    return $html;
+  }
+
+  private function parsePairTags( $text ){
+
+    $found = ''; $pairsFound = array();
+
+    preg_match_all($this->_rgx_pair, $text, $found, PREG_SET_ORDER);
+
+    foreach ($found as $f){ 
+      var_dump($f);
+    }
+
+    return $text;
+
+  }
+
+  private function apply_tag($group, $function, $parameters, $original_tag){
+    // look up if we have such tag
+    $exists = true;
+    if ($exists) {
+      $return = "<strong>Calling function {$function} from group {$group} ";
+      if (!empty($parameters)){
+        $params = new Selectors($parameters);
+        $return .= "with parameters: ";
+        foreach ($params as $p) {
+          $return .= " {$p->field} set as {$p->value} & ";
+        }
+        $return .= ". </strong>";
+      }else{
+        $return .= "without parameters.</strong>";
+      }
+      return $return;
+    }else{
+      return $original_tag;
+    }
+  }
 }
