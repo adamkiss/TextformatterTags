@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Tags for Text fields – Example Tag set
+ *
+ * Example tag set used to show how additional modules are built. Bundled with TextformatterTags.
+ * 
+ * @author Adam Kiss
+ * @version 0.0.1
+ * @since 2012-09-16
+ * @license WTFPL <http://sam.zoy.org/wtfpl/>
+ * 
+ * @link http://www.adamkiss.com
+ */
+
+class TagsExample extends WireData implements Module {
+
+  // just a 'master' shortcut
+  private static $_master = 'TextformatterTags';
+
+  // module information
+  public static function getModuleInfo() {
+    return array(
+      // basic information
+      'title' => 'Tags Example set',
+      'summary' => "Example tag set bundled with Tags for Fields module",
+      'version' => 1,
+      // load information
+      'singular' => true,
+      'autoload' => false,
+      // requirements
+      'requires' => self::$_master
+    );
+  }
+
+  public function init() {
+    var_dump('bitch');
+    $tt = $this->modules->get(self::$_master);
+
+    $data = $this->modules->getModuleConfigData(self::$_master);
+    echo"xmpl: ";var_dump($data);
+    $data['itags']['jedenast:tato'] = array('module'=>'TagsExample');
+    $this->modules->saveModuleConfigData(self::$_master, $data);
+  }
+}
