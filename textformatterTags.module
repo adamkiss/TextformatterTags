@@ -14,9 +14,12 @@
  * @link http://www.adamkiss.com
  */
 
-class TextformatterTags extends WireData implements Module, ConfigurableModule {
+class TextformatterTags extends WireData implements Module {
 
-  // module information
+/***************************************************************************************************
+                                                                                         MODULE INFO
+***************************************************************************************************/
+
   public static function getModuleInfo() {
     return array(
       // basic information
@@ -31,33 +34,10 @@ class TextformatterTags extends WireData implements Module, ConfigurableModule {
     );
   }
 
-  public function __construct() {}
-
-  // config
-  static public function getModuleConfigInputfields(array $data) {
-
-    $inputfields = new InputfieldWrapper();
-
-    // var_dump($data);
-
-    // $f = wire('modules')->get('InputfieldTextarea');
-    // $f->attr('name', 'installed_tags');
-    // $f->attr('value', 'jeblina');
-    // //$f->collapsed = true;
-    // $f->label = "Installed Tags";
-    // $f->description = "! Please do not touch this, or you'll screw this up royally !";
-    // $inputfields->add($f);
-
-    return $inputfields;
-  }
-
-  // variables
-
-  /**
-   * Plain Text Matrix (for reading data)
-   */
-  private $ptm = false;
-
+/***************************************************************************************************
+                                                                                           VARIABLES
+***************************************************************************************************/
+  
   /**
    * Regexp for pair tags
    */
@@ -69,27 +49,43 @@ class TextformatterTags extends WireData implements Module, ConfigurableModule {
   private $_rgx_tag  = '/{{\s?([^}]*)\s?([^}]*)?\s?}}/';
 
   /**
+   * Available groups/functions
+   */
+  private $available_functions = false;
+
+  /**
+   * Array of available modules
+   */
+  private $available_modules = false;
+
+  /**
    * Array of loaded modules
    */
   private $loaded_modules = false;
 
-  //
+/***************************************************************************************************
+                                                                   MODULE STUFF (SUBMODULES, RUNNER)
+***************************************************************************************************/
+
+  public function load_module($group) {
+    try {
+      
+      $module = $this->available_modules[$group];
+      if (!in_array($module, $this->loaded_modules)){
+        $this->loaded_modules[$module] = $this->modules->get($module);
+      }
+      return $this->loaded_modules[$module];
+
+    } catch (Exception $e) {
+      // I have no idea what I'm doing
+    }
+  }
 
   public function init() {
     echo "<pre>";
 
     $this->ptm = $this->modules->get('TextformatterPlaintextMatrix');
     $this->ptm->format($testtest);
-
-    // $data = array (
-    //   'itags' => array(
-    //     'osem:test'=>array('module'=>'tvojtato'),
-    //     'devat:test'=>array('module'=>'tvojtato')
-    //     )
-    // );
-
-    // var_dump($data);
-    // $this->modules->saveModuleConfigData(get_class($this), $data);
 
     echo "</pre>";
   }
@@ -107,6 +103,11 @@ class TextformatterTags extends WireData implements Module, ConfigurableModule {
 
     echo "</pre>";
   }
+
+/***************************************************************************************************
+                                                                           DATA MANIPULATION & CACHE
+***************************************************************************************************/
+
 
   private function applyTags( $text ) {
     //init
