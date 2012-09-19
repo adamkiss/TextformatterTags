@@ -14,7 +14,7 @@
  * @link http://www.adamkiss.com
  */
 
-class TextformatterTags extends WireData implements Module {
+class TextformatterTags extends WireData implements Module, ConfigurableModule { 
 
 /***************************************************************************************************
                                                                                          MODULE INFO
@@ -66,7 +66,9 @@ class TextformatterTags extends WireData implements Module {
 /***************************************************************************************************
                                                                    MODULE STUFF (SUBMODULES, RUNNER)
 ***************************************************************************************************/
-
+  
+  public static function getModuleConfigInputfields(array $data) { return $data; }
+  
   public function load_module($group) {
     try {
       
@@ -84,8 +86,15 @@ class TextformatterTags extends WireData implements Module {
   public function init() {
     echo "<pre>";
 
-    $this->ptm = $this->modules->get('TextformatterPlaintextMatrix');
-    $this->ptm->format($testtest);
+    // $data = $this->modules->getModuleConfigData(get_class($this));
+    // $data = array(
+    //   'available_modules'=>array(
+    //   ),
+    //   'available_functions'=>array(
+    //   )
+    // );
+    // $this->modules->saveModuleConfigData(get_class($this), $data);
+    var_dump($this->modules->getModuleConfigData(get_class($this)));
 
     echo "</pre>";
   }
@@ -97,9 +106,9 @@ class TextformatterTags extends WireData implements Module {
     echo "<pre>";
 
     //$this->loaded_modules = array();
-    $m=$this->modules->get('TagsExample');
-    var_dump('---');
-    var_dump($this->itags);
+    // $m=$this->modules->get('TagsExample');
+    // var_dump('---');
+    // var_dump($this->itags);
 
     echo "</pre>";
   }

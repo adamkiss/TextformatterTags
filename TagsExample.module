@@ -17,6 +17,10 @@ class TagsExample extends WireData implements Module {
 
   // just a 'master' shortcut
   private static $_master = 'TextformatterTags';
+  private static $identificator = 'example';
+  private static $functions = array(
+    'time'=>'time', 'get'=>'field'
+  );
 
   // module information
   public static function getModuleInfo() {
@@ -24,7 +28,7 @@ class TagsExample extends WireData implements Module {
       // basic information
       'title' => 'Tags Example set',
       'summary' => "Example tag set bundled with Tags for Fields module",
-      'version' => 1,
+      'version' => 40,
       // load information
       'singular' => true,
       'autoload' => false,
@@ -34,15 +38,34 @@ class TagsExample extends WireData implements Module {
   }
 
   public function init() {
-    var_dump('bitch');
-    $tt = $this->modules->get(self::$_master);
+    // booyah not needed anything
+  }
 
+  public function ___install(){
+    $tags = $this->modules->get(self::$_master);
     $data = $this->modules->getModuleConfigData(self::$_master);
-    echo"xmpl: ";var_dump($data);
-    $data['itags']['jedenast:tato'] = array('module'=>'TagsExample');
+    
+    if (!array_key_exists(self::$identificator, $data['available_modules']))
+      $data['available_modules'][self::$identificator] = get_class($this);
+
+    if (!array_key_exists(self::$identificator, $data['available_functions']))
+      $data['available_functions'][self::$identificator] = self::$functions;
+
     $this->modules->saveModuleConfigData(self::$_master, $data);
   }
 
+  public function ___uninstall(){
+    $tags = $this->modules->get(self::$_master);
+    $data = $this->modules->getModuleConfigData(self::$_master);
+    
+    if (array_key_exists(self::$identificator, $data['available_modules']))
+      unset($data['available_modules'][self::$identificator]);
+
+    if (array_key_exists(self::$identificator, $data['available_functions']))
+      unset($data['available_functions'][self::$identificator]);
+
+    $this->modules->saveModuleConfigData(self::$_master, $data);
+  }
   /*
     Time example function
     $params:
