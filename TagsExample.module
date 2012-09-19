@@ -6,7 +6,7 @@
  * Example tag set used to show how additional modules are built. Bundled with TextformatterTags.
  * 
  * @author Adam Kiss
- * @version 0.0.1
+ * @version 0.4
  * @since 2012-09-16
  * @license WTFPL <http://sam.zoy.org/wtfpl/>
  * 
@@ -41,5 +41,32 @@ class TagsExample extends WireData implements Module {
     echo"xmpl: ";var_dump($data);
     $data['itags']['jedenast:tato'] = array('module'=>'TagsExample');
     $this->modules->saveModuleConfigData(self::$_master, $data);
+  }
+
+  /*
+    Time example function
+    $params:
+      format: format of the output, defaults to 'H:i:s'
+  */
+  public function time($params, Page $page) {
+    if(isset($params) && array_key_exists('format', $params) && isset($params['format'])) {
+      $format = $params['format'];
+    }else{
+      $format = 'H:i:s';
+    }
+    return date($format);
+  }
+
+  /*
+    Page example function
+    $params:
+      field: field to extract from the page
+  */
+  public function field($params, Page $page) {
+    return $page->get(
+              is_array($params) && array_key_exists('field', $params)
+            ? $params['field']
+            : 'title'
+          );
   }
 }
