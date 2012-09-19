@@ -7,8 +7,8 @@
  * or invoke advanced funcionality via simple tags
  * 
  * @author Adam Kiss
- * @version 0.0.5
- * @since 2012-09-16
+ * @version 0.10
+ * @since 2012-09-20
  * @license WTFPL <http://sam.zoy.org/wtfpl/>
  * 
  * @link http://www.adamkiss.com
@@ -25,7 +25,7 @@ class TextformatterTags extends WireData implements Module, ConfigurableModule {
       // basic information
       'title' => 'Tags for Text fields',
       'summary' => "Gives you simple and block tags funcionality in text fields",
-      'version' => 5, 
+      'version' => 10, 
       // load information
       'singular' => true,
       'autoload' => false,
@@ -68,7 +68,7 @@ class TextformatterTags extends WireData implements Module, ConfigurableModule {
 ***************************************************************************************************/
   
   public static function getModuleConfigInputfields(array $data) { return $data; }
-  
+
   public function load_module($group) {
     try {
       

@@ -1,4 +1,4 @@
-# Tags for Text fields v0.0.5
+# Tags for Text fields v0.1
 
 This Textformatter adds modulat Tag Parser to your fields. Now you can add various functions into
 your text fields via installable modules.
@@ -24,9 +24,9 @@ Extensibility is being prepared. Basically you should install this module, any s
 
 ## Roadmap
 
-Current version: **v0.0.5**
+Current version: **v0.1**
 
-* v0.1 – basic replace done, module is extensible
+* -v0.1 – basic replace done, module is extensible-
 * v0.2 - module can communicate (and call functions) properly
 * v0.3 – module actually works (replaces tags with proper functions)
 * v0.4 - function modules are extended from single class (providing some basic functions)
